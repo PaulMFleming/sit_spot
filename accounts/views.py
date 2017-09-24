@@ -5,7 +5,8 @@ from django.contrib import messages, auth
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
-from accounts.forms import UserRegistrationForm
+from accounts.forms import UserRegistrationForm, UserLoginForm
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -34,5 +35,41 @@ def register(request):
     return render(request, 'register.html', args)
 
 
+"""
+The login_required decorator ensures only those users who are logged in can see their profile.
+"""
+
+@login_required(login_url='/login/')
 def profile(request):
     return render(request, 'profile.html')
+
+
+def login(request):
+    """
+    This method checks for post method and if not displays an empty login form. If it is a POST then the form is
+    populated and checked for validity before authentication.
+    """
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            user = auth.authenticate(email=request.POST.get('email'),
+                                     password=request.POST.get('password'))
+
+            if user is not None:
+                auth.login(request, user)
+                messages.error(request, "You have successfully logged in")
+                return redirect(reverse('profile'))
+            else:
+                form.add_error(None, "Your email or password was not recognised")
+
+    else:
+        form = UserLoginForm()
+
+    args = {'form': form}
+    args.update(csrf(request))
+    return render(request, 'login.html', args)
+
+def logout(request):
+    auth.logout(request)
+    messages.success(request, 'You have successfully logges out')
+    return redirect(reverse('index'))
