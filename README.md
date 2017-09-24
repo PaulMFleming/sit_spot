@@ -1,0 +1,1 @@
+## A meditation timer and community based around sharing insights gained while meditating and nice locations to meditate in.
