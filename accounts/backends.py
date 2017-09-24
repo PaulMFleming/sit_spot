@@ -4,20 +4,20 @@ class EmailAuth(object):
 
     def authenticate(self, email=None, password=None):
         """
-        Get an instance of User using the supplied email 
-        and check it's password
+        Get an instance of User using the supplied
+        email and check its password
         """
         try:
-            user= User.objects.get(email=email)
+            user = User.objects.get(email=email)
             if user.check_password(password):
-                return User
+                return user
 
         except User.DoesNotExist:
             return None
 
     def get_user(self, user_id):
         """
-        Used by the django authentication system
+        Used by django authentication system
         to retrieve an instance of User
         """
         try:
